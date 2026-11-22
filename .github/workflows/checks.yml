@@ -1,0 +1,50 @@
+# Checks for pull requests and for main. Nothing here builds the Map: that needs the game and the
+# mods, which are not on GitHub (ADR 0001 and 0002). The checks run the code's own tests instead.
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A new push to the same pull request cancels the checks still running for the previous one.
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pipeline:
+    name: Pipeline tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: pipeline
+      # Also checks plugin-sets.toml, the file the build reads.
+      - run: cargo test --locked
+
+  web:
+    name: Site type check and tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      # Also checks that the Russian dictionary has every key of the English one.
+      - run: npx tsc --noEmit
+      - run: npm test
