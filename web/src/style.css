@@ -178,15 +178,16 @@ body,
 }
 
 /* Tab on the panel's right edge, level with the search box; it stays at the page's left edge
-   when the panel is folded away. */
+   when the panel is folded away. Its top is still within the panel's rounded corner, so it
+   reaches 2px under the panel, one layer below it, to leave no gap there. */
 .panel-fold {
   position: absolute;
   top: 22px;
-  left: calc(12px + var(--panel-width));
-  z-index: 1000;
+  left: calc(10px + var(--panel-width));
+  z-index: 999;
   display: grid;
   place-items: center;
-  width: 22px;
+  width: 24px;
   height: 44px;
   padding: 0;
   border: 1px solid var(--border);
@@ -208,7 +209,7 @@ body,
 .panel-fold__chevron {
   width: 8px;
   height: 8px;
-  margin-left: 3px;
+  margin-left: 5px;
   border-bottom: 2px solid currentColor;
   border-left: 2px solid currentColor;
   transform: rotate(45deg);
@@ -224,11 +225,11 @@ body,
 }
 
 :root[data-panel='folded'] .panel-fold {
-  left: 0;
+  left: -2px;
 }
 
 :root[data-panel='folded'] .panel-fold__chevron {
-  margin: 0 3px 0 0;
+  margin: 0 1px 0 0;
   transform: rotate(-135deg);
 }
 

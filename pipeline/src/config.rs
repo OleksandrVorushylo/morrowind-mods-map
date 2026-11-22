@@ -229,4 +229,12 @@ position = [23.5, -27.5]");
     fn rejects_unknown_modes() {
         assert!(config("classes = { shipmaster = \"boat\" }").validate().is_err());
     }
+
+    /// The file the build reads, so that a mistake in it shows on a pull request, not hours into a build.
+    #[test]
+    fn the_plugin_sets_file_of_the_repository_is_valid() {
+        let sets = SetsFile::load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../plugin-sets.toml")).unwrap();
+        assert_eq!(sets.sets.iter().filter(|set| set.locked).count(), 1, "one Base Set");
+        assert!(!sets.transport.classes.is_empty());
+    }
 }
