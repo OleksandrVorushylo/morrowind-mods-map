@@ -9,6 +9,8 @@
   --field: rgb(20 24 32 / 5%);
   --hover: rgb(20 24 32 / 7%);
   --shadow: 0 10px 40px rgb(15 20 30 / 18%);
+  /* Leaves room for the fold tab on the panel's right edge on narrow screens. */
+  --panel-width: min(348px, calc(100vw - 46px));
 }
 
 html,
@@ -162,7 +164,7 @@ body,
   flex-direction: column;
   gap: 10px;
   box-sizing: border-box;
-  width: min(348px, calc(100vw - 24px));
+  width: var(--panel-width);
   max-height: calc(100vh - 80px);
   padding: 12px;
   border: 1px solid var(--border);
@@ -173,6 +175,68 @@ body,
   color: var(--fg);
   font-size: 14px;
   line-height: 1.4;
+}
+
+/* Tab on the panel's right edge, level with the search box; it stays at the page's left edge
+   when the panel is folded away. */
+.panel-fold {
+  position: absolute;
+  top: 22px;
+  left: calc(12px + var(--panel-width));
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-left: 0;
+  border-radius: 0 10px 10px 0;
+  background: var(--bg);
+  backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 6px 4px 16px rgb(15 20 30 / 12%);
+  color: var(--muted);
+  cursor: pointer;
+  transition: left 0.25s ease;
+}
+
+.panel-fold:hover,
+.panel-fold:focus-visible {
+  color: var(--fg);
+}
+
+.panel-fold__chevron {
+  width: 8px;
+  height: 8px;
+  margin-left: 3px;
+  border-bottom: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.panel {
+  transition: transform 0.25s ease, visibility 0.25s;
+}
+
+:root[data-panel='folded'] .panel {
+  transform: translateX(calc(-100% - 20px));
+  visibility: hidden;
+}
+
+:root[data-panel='folded'] .panel-fold {
+  left: 0;
+}
+
+:root[data-panel='folded'] .panel-fold__chevron {
+  margin: 0 3px 0 0;
+  transform: rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel-fold {
+    transition: none;
+  }
 }
 
 .panel-top {

@@ -23,6 +23,13 @@ const EXTRA_ZOOM = 1
 /** Room the panel takes on the left, kept clear when the Map first frames the land. */
 const PANEL_WIDTH = 370
 
+/** Where the choice to fold the panel away is remembered. */
+const PANEL_STORAGE_KEY = 'panel'
+
+function panelFolded(): boolean {
+  return document.documentElement.dataset.panel === 'folded'
+}
+
 /** Zoom the Map moves to when a Location of each kind is picked from far away. */
 const PICK_ZOOM: Record<Kind, number> = { region: 4, settlement: 6, entrance: 8 }
 
@@ -146,6 +153,12 @@ function locationCard(place: Location): HTMLElement {
 
 async function start(): Promise<void> {
   applyToDocument()
+  // Read first: the Map frames the land clear of the panel only while the panel is open.
+  try {
+    document.documentElement.dataset.panel = localStorage.getItem(PANEL_STORAGE_KEY) === 'folded' ? 'folded' : 'open'
+  } catch {
+    // Storage can be blocked; the panel starts open then.
+  }
   const manifest = await loadManifest()
   // Transport data loads together with the Locations, not after them.
   let transportFailed = false
@@ -301,7 +314,7 @@ async function start(): Promise<void> {
   function frame(sets: PluginSet[]): void {
     const bounds = L.latLngBounds([])
     for (const set of sets) bounds.extend(setBounds(set))
-    map.fitBounds(bounds, { paddingTopLeft: [Math.min(PANEL_WIDTH, map.getSize().x / 4), 0] })
+    map.fitBounds(bounds, { paddingTopLeft: [panelFolded() ? 0 : Math.min(PANEL_WIDTH, map.getSize().x / 4), 0] })
   }
 
   const view = viewFromUrl(manifest)
@@ -371,6 +384,34 @@ async function start(): Promise<void> {
 
   const panel = document.createElement('div')
   panel.className = 'panel'
+  panel.id = 'panel'
+  // A tab on the panel's right edge folds the whole panel away to the left edge of the page.
+  const fold = document.createElement('button')
+  fold.type = 'button'
+  fold.className = 'panel-fold'
+  fold.setAttribute('aria-controls', panel.id)
+  const chevron = document.createElement('span')
+  chevron.className = 'panel-fold__chevron'
+  chevron.setAttribute('aria-hidden', 'true')
+  fold.append(chevron)
+  function setFolded(folded: boolean): void {
+    document.documentElement.dataset.panel = folded ? 'folded' : 'open'
+    fold.setAttribute('aria-expanded', String(!folded))
+    // Folded away, the panel keeps its controls out of the tab order.
+    panel.inert = folded
+    const label = t(folded ? 'showPanel' : 'hidePanel')
+    fold.title = label
+    fold.setAttribute('aria-label', label)
+  }
+  fold.addEventListener('click', () => {
+    const folded = !panelFolded()
+    setFolded(folded)
+    try {
+      localStorage.setItem(PANEL_STORAGE_KEY, folded ? 'folded' : 'open')
+    } catch {
+      // Remembering the choice is only a convenience.
+    }
+  })
   const top = document.createElement('div')
   top.className = 'panel-top'
   const language = document.createElement('button')
@@ -392,11 +433,12 @@ async function start(): Promise<void> {
     language.setAttribute('aria-label', t('language'))
     menu.title = t('legend')
     menu.setAttribute('aria-label', t('legend'))
+    setFolded(panelFolded())
   }
   labelButtons()
   top.append(createSearch(locations, (place) => select(place, true)), language, menu)
   panel.append(top, legend.element)
-  document.body.append(panel, createFooter(manifest))
+  document.body.append(panel, fold, createFooter(manifest))
 
   onLangChange(() => {
     closeLegendInfoWithin(legend.element)
