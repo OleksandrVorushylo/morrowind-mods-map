@@ -183,11 +183,27 @@ impl LocalPaths {
     }
 }
 
-/// Finds a plugin or archive by file name in the data directories.
+/// Finds a plugin or archive by file name in the data directories, also where the case of its
+/// name differs on disk: plugins name their masters in any case, and Linux tells case apart.
 pub fn find_file(dirs: &[PathBuf], name: &str) -> Result<PathBuf> {
     for dir in dirs {
         let path = dir.join(name);
         if path.is_file() {
+            return Ok(path);
+        }
+    }
+    for dir in dirs {
+        let Ok(entries) = fs::read_dir(dir) else { continue };
+        let mut matches: Vec<PathBuf> = entries
+            .flatten()
+            .map(|entry| entry.path())
+            .filter(|path| path.is_file() && path.file_name().is_some_and(|file| file.to_string_lossy().eq_ignore_ascii_case(name)))
+            .collect();
+        matches.sort();
+        if matches.len() > 1 {
+            bail!("More than one file matches {name} in {}", dir.display());
+        }
+        if let Some(path) = matches.pop() {
             return Ok(path);
         }
     }

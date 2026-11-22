@@ -10,9 +10,8 @@ use anyhow::{Context, Result};
 use serde::Serialize;
 use tes3::esp::{Class, Creature, Dialogue, DialogueInfo, GlobalVariable, Plugin, TES3Object};
 
-use crate::config::{LocalPaths, SetsFile};
+use crate::config::{find_file, LocalPaths, SetsFile};
 use crate::locations::plugin_file;
-use crate::transport::find_plugin;
 
 #[derive(Serialize)]
 struct Carrier {
@@ -203,7 +202,7 @@ pub fn run(root: &Path, out: &Path) -> Result<()> {
         if seen.insert(name.to_ascii_lowercase(), ()).is_some() {
             continue;
         }
-        match find_plugin(&dirs, &name) {
+        match find_file(&dirs, &name) {
             Ok(path) => {
                 println!("Reading {}", path.display());
                 read(&set, &path, &mut report)?;

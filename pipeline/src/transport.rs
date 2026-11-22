@@ -10,7 +10,7 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result};
 use serde::Serialize;
 use tes3::esp::{
     Activator, Cell, Creature, Dialogue, DialogueInfo, FilterComparison, FilterType, FilterValue, GlobalVariable, MiscItem, Npc,
@@ -561,29 +561,6 @@ fn collect_references(plugin: &Plugin, path: &Path) -> Vec<Reference> {
     result
 }
 
-/// Finds a plugin by name, also where the case of its name differs on disk.
-pub fn find_plugin(dirs: &[PathBuf], name: &str) -> Result<PathBuf> {
-    if let Ok(path) = find_file(dirs, name) {
-        return Ok(path);
-    }
-    for dir in dirs {
-        let Ok(entries) = fs::read_dir(dir) else { continue };
-        let mut matches: Vec<PathBuf> = entries
-            .flatten()
-            .map(|entry| entry.path())
-            .filter(|path| path.is_file() && path.file_name().is_some_and(|file| file.to_string_lossy().eq_ignore_ascii_case(name)))
-            .collect();
-        matches.sort();
-        if matches.len() > 1 {
-            bail!("More than one file matches {name} in {}", dir.display());
-        }
-        if let Some(path) = matches.pop() {
-            return Ok(path);
-        }
-    }
-    bail!("{name} was not found in any data directory")
-}
-
 /// Matches "is this mod installed" global variables to the Plugin Sets that set them: a variable
 /// declared in some plugin that a start script of exactly one set sets to 1 outside of any condition.
 fn installed_globals(groups: &[(String, Group)]) -> HashMap<String, String> {
@@ -649,7 +626,7 @@ pub fn build(root: &Path, out: &Path, only: &[String], russian: &Russian) -> Res
         if set.is_backdrop() || (!only.is_empty() && !set.locked && !only.contains(&set.id)) {
             continue;
         }
-        let files: Vec<PathBuf> = match set.plugins.iter().map(|name| find_plugin(&dirs, name)).collect::<Result<_>>() {
+        let files: Vec<PathBuf> = match set.plugins.iter().map(|name| find_file(&dirs, name)).collect::<Result<_>>() {
             Ok(files) => files,
             Err(error) if !set.locked => {
                 eprintln!("Skipping {}: {error}", set.id);
@@ -996,7 +973,7 @@ mod tests {
         let path = dir.join("Cyr_Main.esm");
         fs::write(&path, b"fixture").unwrap();
         // On a file system that ignores case the name comes back as asked for.
-        let found = find_plugin(std::slice::from_ref(&dir), "Cyr_Main.ESM").unwrap();
+        let found = find_file(std::slice::from_ref(&dir), "Cyr_Main.ESM").unwrap();
         assert!(found.to_string_lossy().eq_ignore_ascii_case(&path.to_string_lossy()));
         fs::remove_dir_all(dir).unwrap();
     }

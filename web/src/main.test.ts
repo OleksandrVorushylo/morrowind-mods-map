@@ -75,7 +75,9 @@ describe('the page', () => {
 
   it('works without transport, and tells when it could not be loaded', async () => {
     const { 'transport/index.json': _index, ...rest } = files
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
     await boot('/', rest)
+    expect(logged).toHaveBeenCalledWith(new Error('Transport index: 404'))
     expect(document.querySelector('.transport-notice')!.textContent).toContain('Transport data could not be loaded.')
     expect(document.querySelector('.transport-options')).toBeNull()
   })

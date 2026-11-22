@@ -90,7 +90,7 @@ fn says_when_two_files_differ_only_in_case() {
     dir.write("a.ESP", "");
     // Only a file system that tells case apart can hold both.
     if fs::read_dir(dir.path()).unwrap().count() == 2 {
-        let error = find_plugin(&[dir.path().to_path_buf()], "A.Esp").unwrap_err();
+        let error = crate::config::find_file(&[dir.path().to_path_buf()], "A.Esp").unwrap_err();
         assert!(error.to_string().contains("More than one file"));
     }
 }
