@@ -117,6 +117,24 @@ npm run dev
 
 and open the address it prints.
 
+## Android app
+
+The Android app uses Capacitor and can be built on Linux, Windows or macOS. It includes map labels, transport and intervention data downloaded from the public map when building. Map images are downloaded when viewed and kept in an app cache of up to 5 GiB; previously viewed areas remain available offline until they are evicted. Unvisited areas need an internet connection. If the public map changes, the app warns that it needs a new build before downloading new tiles. The game and mod plugins are not needed for this build.
+
+Install Node.js 24 or newer, JDK 21 and Android SDK with platform 36 and build-tools 36.0.0. Set `JAVA_HOME` and `ANDROID_HOME` to your JDK and Android SDK directories. Android Studio can install the SDK on all three systems.
+
+From the repository root:
+
+```sh
+cd web
+npm ci
+npm run android:apk
+```
+
+The debug APK is written to `web/android/app/build/outputs/apk/debug/Morrowind-Mods-Map.apk`. The build needs internet access to download dependencies and a consistent snapshot of the public map's data. It does not overwrite `web/public/data`, so a locally built website remains separate.
+
+The **Android APK** GitHub Actions workflow can also be started manually. It builds on Linux, Windows and macOS and attaches each debug APK to its workflow run. Debug APKs are signed with the build machine's debug key; APKs built on different machines or separate GitHub-hosted runs cannot necessarily update each other without uninstalling first. Back up any personal app data before uninstalling.
+
 ## Licence
 
 The code is under the [MIT licence](./LICENSE). The map tiles and location data are derived from The Elder Scrolls III: Morrowind (Bethesda Softworks) and the mods shown, and are not covered by it.

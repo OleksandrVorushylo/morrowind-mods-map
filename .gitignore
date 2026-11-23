@@ -8,10 +8,12 @@
 /pipeline/target/
 /web/node_modules/
 /web/dist/
+/web/android-assets/
+/web/android/**/*.jks
+/web/android/**/*.keystore
 /web/coverage/
 
 # Map data built by the pipeline: about 3.4 GB of tiles, too large for the repository
 /web/public/data/
 /docs/
 /deploy/
- 

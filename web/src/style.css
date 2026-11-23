@@ -1054,3 +1054,49 @@ body,
   font-size: 12px;
   line-height: 1.3;
 }
+
+.no-flex-gap .panel {
+  gap: 0;
+}
+
+.no-flex-gap .panel-top {
+  margin-bottom: 10px;
+}
+
+.no-flex-gap .panel-top > * + * {
+  margin-left: 6px;
+}
+
+.no-flex-gap .search-icon {
+  margin-right: 11px;
+}
+
+.no-flex-gap .legend .legend-set > details {
+  margin-left: 8px;
+}
+
+.no-flex-gap .check input {
+  margin-right: 8px;
+}
+
+.no-flex-gap .transport-swatch,
+.no-flex-gap .intervention-swatch {
+  margin-right: 8px;
+}
+
+.no-flex-gap .route-input-row > * + *,
+.no-flex-gap .route-controls > * + * {
+  margin-left: 6px;
+}
+
+.no-flex-gap .route-pick-banner > * + * {
+  margin-left: 10px;
+}
+
+.no-flex-gap .loc i {
+  margin-right: 5px;
+}
+
+.no-flex-gap .footer__link {
+  margin-right: 7px;
+}

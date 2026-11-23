@@ -36,6 +36,8 @@ function cacheTiles(): Plugin {
 }
 
 export default defineConfig({
+  publicDir: process.env.ANDROID_BUILD === '1' ? 'android-assets' : 'public',
+  build: process.env.ANDROID_BUILD === '1' ? { target: 'chrome83' } : {},
   // Relative paths, so the site works both under a GitHub Pages subfolder and on its own domain.
   base: './',
   plugins: [cacheTiles()],

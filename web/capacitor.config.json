@@ -1,0 +1,8 @@
+{
+  "appId": "org.morrowindmodsmap.personal",
+  "appName": "Morrowind Mods Map",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  }
+}

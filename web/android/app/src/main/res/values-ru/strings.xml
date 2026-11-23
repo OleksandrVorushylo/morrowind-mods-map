@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="map_offline">Нет связи с сервером карты. Незагруженные участки недоступны.</string>
+    <string name="map_updated">Карта на сайте обновилась. Пересоберите приложение для загрузки новых участков.</string>
+</resources>

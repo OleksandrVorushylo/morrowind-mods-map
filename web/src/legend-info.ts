@@ -7,6 +7,10 @@ let active: HTMLButtonElement | null = null
 let tooltip: HTMLElement | null = null
 let pinned = false
 
+function focusVisible(button: HTMLButtonElement): boolean {
+  try { return button.matches(':focus-visible') } catch { return document.activeElement === button }
+}
+
 function close(): void {
   active?.setAttribute('aria-expanded', 'false')
   active?.removeAttribute('aria-describedby')
@@ -80,8 +84,8 @@ export function createLegendInfo(kind: InfoKind, sets: PluginSet[], data: Transp
   icon.textContent = 'i'
   button.append(icon)
   button.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse' && !pinned) show(button, kind, sets, data, false) })
-  button.addEventListener('pointerleave', () => { if (active === button && !pinned && !button.matches(':focus-visible')) close() })
-  button.addEventListener('focus', () => { if (button.matches(':focus-visible') && !pinned) show(button, kind, sets, data, false) })
+  button.addEventListener('pointerleave', () => { if (active === button && !pinned && !focusVisible(button)) close() })
+  button.addEventListener('focus', () => { if (focusVisible(button) && !pinned) show(button, kind, sets, data, false) })
   button.addEventListener('blur', () => { if (active === button && !pinned) close() })
   button.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') event.stopPropagation() })
   button.addEventListener('click', (event) => {

@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Morrowind Mods Map</string>
+    <string name="title_activity_main">Morrowind Mods Map</string>
+    <string name="package_name">org.morrowindmodsmap.personal</string>
+    <string name="custom_url_scheme">org.morrowindmodsmap.personal</string>
+    <string name="map_offline">Map server is unavailable. Areas not yet cached cannot be shown.</string>
+    <string name="map_updated">The website map has changed. Rebuild the app to load new areas safely.</string>
+</resources>

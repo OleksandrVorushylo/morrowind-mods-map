@@ -1,3 +1,4 @@
+import './android-compat'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import '@fontsource-variable/montserrat'
